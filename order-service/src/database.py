@@ -5,34 +5,20 @@ import datetime
 db = SQLAlchemy()
 bcrypt = Bcrypt()
 
-class Order(db.Model):
+class Ord(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     customer_id = db.Column(db.Integer, nullable=False)
+    product_id = db.Column(db.Integer, nullable=False)  
+    amount = db.Column(db.Integer, nullable=False)
     status = db.Column(db.String(50), nullable=False, default='pending')
-    amount = db.Column(db.Float, nullable=False)
+
 
     def to_dict(self):
         return {
             'id': self.id,
             'customer_id': self.customer_id,
             'status': self.status,
-            'amount': self.amount
+            'amount': self.amount,
+            'product_id': self.product_id
         }
-
-# class Order(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     customer_id = db.Column(db.Integer, nullable=False)
-#     status = db.Column(db.String(50), nullable=False)
-#     amount = db.Column(db.Float, nullable=False)
-
-#     def __repr__(self):
-#         return f'<Order {self.id}>'
-    
-#     def to_dict(self):
-#         return {
-#             "id": self.id,
-#             "customer_id": self.customer_id,
-#             "status": self.status,
-#             "amount": self.amount
-#         }
 

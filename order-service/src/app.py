@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request
 import os
 import json
 from flask_cors import CORS
-from database import db,Order, bcrypt
+from database import db,Ord, bcrypt
 from redis import Redis
 import subprocess
 import logging
@@ -27,18 +27,23 @@ bcrypt.init_app(app)
 @app.route('/orders', methods=['POST'])
 def create_order():
     data = request.json
-    new_order = Order(customer_id=data['customer_id'], amount=data['amount'])
+    new_order = Ord(
+        customer_id=data['customer_id'],
+        product_id=data['product_id'],  
+        amount=data['amount'],
+        status='pending' 
+    )
     db.session.add(new_order)
     db.session.commit()
 
-    r.publish('order_created', json.dumps({'order_id': new_order.id, 'customer_id': new_order.customer_id, 'amount': new_order.amount}))
+    r.publish('order_created', json.dumps({'order_id': new_order.id, 'customer_id': new_order.customer_id, 'amount': new_order.amount, 'product_id': new_order.product_id}))
 
     return jsonify(new_order.to_dict()), 201
 
 
 def update_order_status(order_id, status):
     with app.app_context():
-        order = db.session.get(Order, order_id)
+        order = db.session.get(Ord, order_id)
         if order:
             order.status = status
             db.session.commit()
@@ -46,9 +51,9 @@ def update_order_status(order_id, status):
 
 @app.route('/orders/<int:order_id>', methods=['GET'])
 def get_order(order_id):
-    order = Order.query.get(order_id)
+    order = Ord.query.get(order_id)
     if order:
-        return jsonify({'customer_id': order.customer_id, 'status': order.status, 'amount': order.amount})
+        return jsonify({'customer_id': order.customer_id, 'status': order.status, 'amount': order.amount,'product_id': new_order.product_id})
     else:
         return jsonify({'error': 'Order not found'}), 404
 
